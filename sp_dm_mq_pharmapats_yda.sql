@@ -132,6 +132,10 @@ CREATE TEMPORARY TABLE tmqD
   ;  
 /**********************************************************************************************************************************/
 
+/** Place yesterday into history TABLE **/
+INSERT INTO dm_PharmaPats_H
+SELECT * from dm_PharmaPats_YDA;
+
 /** BEGIN POPULATE TABLE **/
 TRUNCATE TABLE dm_PharmaPats_YDA;
 INSERT INTO dm_PharmaPats_YDA
