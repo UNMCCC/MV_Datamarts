@@ -8,6 +8,7 @@ BEGIN
   --  Calls:
   --  Description:  Combine data from Mosaiq (MQ) with patients enrolled on Industrial (a.k.a. Pharma) trials 
                     If available included the calendar(schedule) name for billing/finance purposes
+					Insert prior data into history table and replace with new data
   --  Uses:         A patient enrolled on study will have a calendar setup with multiple events planned to be marked Done over time
   --  Method:       Create temp table of patients enrolled on industrial trials (studies)
                     Create temp table of calendar name (no events, coverage, ect.)
@@ -27,7 +28,7 @@ BEGIN
   --  Project:      Velos Calendars
   --  Author:       Rick Compton
   --  Created:      November 2020
-  --  Modified:     2020-Dec-21
+  --  Modified:     2021-Jan-7
   --  Formerly:     sp_DM_Patient_Enroll_Industrial
 \*********************************************************************************************************************************************/
 
