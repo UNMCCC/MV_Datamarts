@@ -1,5 +1,5 @@
-DROP PROCEDURE IF EXISTS minivelos.sp_DM_Study;
-CREATE PROCEDURE minivelos.`sp_DM_Study`()
+DROP PROCEDURE IF EXISTS sp_DM_Study;
+CREATE PROCEDURE `sp_DM_Study`()
 BEGIN
 /****NOTE CHANGE -- change size of length of study_type field in ER_Study table to be 25 to handle upcoming field change (from 3) */
 
@@ -13,7 +13,7 @@ BEGIN
 **  Exclusions: None
 **  Aliases:    s = site,   st = study,   stid = studyid,   stst = studystat, sttm = studyteam, stsi = studysites,
 **                rcwg=ref_clinical_working_group
-**  Last update date: 2020-09-25 (RC and Quinn added clinical working group desc and sort)
+**  Last update date: 2020-20-21 (RC added trim on sample size to remove spaces allowed by UI
 */
 
 DROP TABLE IF EXISTS temp_DiseaseNames;
@@ -193,8 +193,8 @@ SELECT
     RTRIM(SUBSTRING(stst.STUDYSTAT_NOTE,1,2000))      AS statusNote_stst,       -- to support weekly status reporting add 9/11/2020
     
   /** STUDY SITE DATA -- This is added via a link after NationalSampleSize is entered for the STUDY --related to both SITE and STUDYSTATUS table **/
-     CAST(stsi.studysite_lsamplesize AS unsigned)     AS sampleSizeLocal_stsi,     -- this IS the local sample size by site/organization
-     CAST(stsi.studysite_enrcount AS unsigned)        AS enrolledCount_stsi,        -- is this in the UI?  How to check this?
+    CAST(TRIM(stsi.studysite_lsamplesize) AS unsigned)AS sampleSizeLocal_stsi,     -- this IS the local sample size by site/organization, add TRIM for trailing space found 1/20/2021 on PK4920 (study NRG-CC007CD)
+    CAST(stsi.studysite_enrcount AS unsigned)         AS enrolledCount_stsi,        -- is this in the UI?  How to check this?
     
   /** STUDY TEAM **/
     sttmRegCoor.usr_Lastname                          AS regCoordPrimLast_sttm_lu,   -- study team   
@@ -268,8 +268,8 @@ LEFT JOIN ref_clinical_working_group    rcwg  ON stidClWrkG.studyid_id = rcwg.VA
 /**********************************************************************************************************************************/
  
 /* BEGIN POPULATE TABLE  */
-TRUNCATE TABLE minivelos.dm_study;
-INSERT INTO minivelos.dm_study
+TRUNCATE TABLE dm_study;
+INSERT INTO dm_study
 SELECT * FROM temp_DM_Study
 ;
   
