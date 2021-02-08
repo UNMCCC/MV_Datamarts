@@ -8,7 +8,7 @@ BEGIN
   --  Calls:
   --  Description:  Combine data from Mosaiq (MQ) with patients enrolled on Industrial (a.k.a. Pharma) trials 
                     If available included the calendar(schedule) name for billing/finance purposes
-					Insert prior data into history table and replace with new data
+                    Insert prior data into history table and replace with new data
   --  Uses:         A patient enrolled on study will have a calendar setup with multiple events planned to be marked Done over time
   --  Method:       Create temp table of patients enrolled on industrial trials (studies)
                     Create temp table of calendar name (no events, coverage, ect.)
@@ -28,7 +28,7 @@ BEGIN
   --  Project:      Velos Calendars
   --  Author:       Rick Compton
   --  Created:      November 2020
-  --  Modified:     2021-Jan-7
+  --  Modified:     2020-Feb-8                  
   --  Formerly:     sp_DM_Patient_Enroll_Industrial
 \*********************************************************************************************************************************************/
 
@@ -68,9 +68,9 @@ CREATE TEMPORARY TABLE temp_curcalname
 DROP TEMPORARY TABLE IF EXISTS temp_labs_cpts;
 CREATE TEMPORARY TABLE temp_labs_cpts
   SELECT DISTINCT
-    lcpt.*
-  FROM labs_cpts lcpt
-  WHERE lcpt.labname_mq <> '' -- labname_mq is required to support join to mq_labs
+    *
+  FROM ref_labs_cpts
+  WHERE labdesc <> '' -- labdesc is required to support join below
 ;
 
 /** TEMPORARY TABLE for Mosaiq data from 3 source extracts - appts, chemo orders and labs from yesterday **/
@@ -110,7 +110,7 @@ CREATE TEMPORARY TABLE temp_mq_data
     mql.provider,
     '',
     '',
-    mql.lab_name, -- this is the lab ordered, the patient may or may not have a corresponding appointment from above (likely yes)
+    mql.lab_name, -- this is the lab ordered, the patient may or may not have a corresponding appointment from appt. above (likely yes)
     mql.lab_code,
     mql.condition_notes,
     'Labs'
@@ -123,12 +123,12 @@ CREATE TEMPORARY TABLE tmqD
   SELECT DISTINCT
      tpats.studyNumber_st, tpats.studyTitle_st, tpats.patStudyId_pp, tpats.patName_p
     ,tmqD.*
-    ,tcpts.cpt, tcpts.cpt_additional, tcpts.labname_tricore
+    ,tcpts.cpt, tcpts.cpt_additional, tcpts.labname_tricore, tcpts.map_status
     ,tcal.scheduleName_ea
     ,CURRENT_TIMESTAMP() AS `xDMrunDt`
   FROM temp_mq_data tmqD
     INNER JOIN temp_DM_Patient_Industrial     tpats    ON tmqD.MRN_mq = tpats.personCode_p -- link where MRN exists on Industrial(pharma) trial 
-    LEFT JOIN temp_labs_cpts                  tcpts    ON tmqD.LabName_mq = tcpts.labname_mq -- add if labs_cpts are available
+    LEFT JOIN temp_labs_cpts                  tcpts    ON tcpts.labdesc = tmqD.LabName_mq -- add if ref_labs_cpts are available
     LEFT JOIN temp_curcalname                 tcal     ON tmqD.MRN_mq = tcal.personCode_p -- add patient's current calendar if available
   ;  
 /**********************************************************************************************************************************/
