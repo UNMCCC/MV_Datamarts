@@ -5,7 +5,7 @@ BEGIN
 /********************************************************************************************************************************************\
   --  Name:         sp_DM_MQ_PharmaPats_Yesterday
   --  Depends on:   dm_study, dm_study_current, dm_patient, dm_calendar, mq_appointments, mq_chemos, mq_labs, labs_cpts
-  --  Calls:
+  --  Calls:        sp_MQ_AddNewLabRefs
   --  Description:  Combine data from Mosaiq (MQ) with patients enrolled on Industrial (a.k.a. Pharma) trials 
                     If available included the calendar(schedule) name for billing/finance purposes
                     Insert prior data into history table and replace with new data
@@ -21,16 +21,19 @@ BEGIN
   --  Criteria:     Only include patient's current calendar (exclude previous/history)
   --  Note:         MQ data imported on Monday's inclusive of previous 3 days (Friday, Sarurday and Sunday)
   --  Aliases:      dm_study_current = dmsc, dm_patient = dmp, dm_calendar = dmc
-                    mq_appointments = mqA, mq_chemos = mqC, mq_labs = mql, labs_cpts = lcpt
+                    mq_appointments = mqA, mq_chemos = mqC, mq_labs = mql, ref_labs_cpts = lcpt
                     temp_mq_data = tmqD, temp_DM_Patient_Industrial = tpats, 
                     temp_labs_cpts = tcpts, temp_curcalname = tcal
   --  Group:        Finance/Billing
   --  Project:      Velos Calendars
   --  Author:       Rick Compton
   --  Created:      November 2020
-  --  Modified:     2020-Feb-8                  
+  --  Modified:     2020-Feb-12                  
   --  Formerly:     sp_DM_Patient_Enroll_Industrial
 \*********************************************************************************************************************************************/
+
+/** Add any missing labs to reference table from today's mq_labs **/
+CALL sp_MQ_AddNewLabRefs();
 
 /** TEMPORARY TABLE for patients on industrial trials  **/
 DROP TEMPORARY TABLE IF EXISTS temp_DM_Patient_Industrial;
