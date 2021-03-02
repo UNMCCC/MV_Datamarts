@@ -28,7 +28,7 @@ BEGIN
   --  Project:      Velos Calendars
   --  Author:       Rick Compton
   --  Created:      November 2020
-  --  Modified:     2020-Feb-12                  
+  --  Modified:     2020-Mar-2
   --  Formerly:     sp_DM_Patient_Enroll_Industrial
 \*********************************************************************************************************************************************/
 
@@ -90,6 +90,7 @@ CREATE TEMPORARY TABLE temp_mq_data
     ''                    AS `LabName_mq`,
     ''                    AS `LabCode_mq`,
     ''                    AS `LabNotes_mq`,
+    ''                    AS `CycleInfo_mq`, -- add cycle information placeholder
     'Appt'                AS `Source_mq`
   FROM mq_appointments mqA
   UNION SELECT 
@@ -103,6 +104,7 @@ CREATE TEMPORARY TABLE temp_mq_data
     '',
     '',
     '',
+    CONCAT(IF(cycle_number=0,'',CONCAT('C',cycle_number,' / ')),IF(cycle_day=0,'',CONCAT('D',cycle_day)),IF(dlyd=0,'',' Delayed')), -- cycle_number, cycle_day, delayed formatted: "C### / D### Delayed" (Delayed is where dlyd = 1)
     'Chemo'
   FROM mq_chemos mqC
   UNION SELECT 
@@ -116,6 +118,7 @@ CREATE TEMPORARY TABLE temp_mq_data
     mql.lab_name, -- this is the lab ordered, the patient may or may not have a corresponding appointment from appt. above (likely yes)
     mql.lab_code,
     mql.condition_notes,
+    '',
     'Labs'
   FROM mq_labs mql
 ;
