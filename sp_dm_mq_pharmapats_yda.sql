@@ -104,7 +104,7 @@ CREATE TEMPORARY TABLE temp_mq_data
     '',
     '',
     '',
-    CONCAT(IF(cycle_number=0,'',CONCAT('C',cycle_number,' / ')),IF(cycle_day=0,'',CONCAT('D',cycle_day)),IF(dlyd=0,'',' Delayed')), -- cycle_number, cycle_day, delayed formatted: "C### / D### Delayed" (Delayed is where dlyd = 1)
+    TRIM(CONCAT(IF(cycle_number=0,'',CONCAT('C',cycle_number,' / ')),IF(cycle_day=0,'',CONCAT('D',cycle_day)),IF(dlyd=0,'',' Delayed'))), -- cycle_number, cycle_day, delayed formatted: "C### / D### Delayed" (Delayed is where dlyd = 1)
     'Chemo'
   FROM mq_chemos mqC
   UNION SELECT 
