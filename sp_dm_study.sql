@@ -13,7 +13,7 @@ BEGIN
 **  Exclusions: None
 **  Aliases:    s = site,   st = study,   stid = studyid,   stst = studystat, sttm = studyteam, stsi = studysites,
 **                rcwg=ref_clinical_working_group
-**  Last update date: 2020-20-21 (RC added trim on sample size to remove spaces allowed by UI
+**  Last update date: 2021-Apr-15 (added field STUDYSTAT_HSPN as statusOrgSpecCurRpt from er_study_stat)
 */
 
 DROP TABLE IF EXISTS temp_DiseaseNames;
@@ -184,6 +184,10 @@ SELECT
       WHEN stst.current_stat = 1 THEN 'Y'
       ELSE 'N'
     END                                               AS statusCurrentFlag_stst,   -- values:  0=not current, 1=current           
+    CASE 
+      WHEN stst.STUDYSTAT_HSPN  = 1 THEN 'Y'
+      ELSE 'N'
+    END                                               AS statusOrgSpecCurRpt_stst,   -- values:  0=not current, 1=current
     DATE_FORMAT(stst.studystat_date,'%Y%m%d')         AS statusValidFromDt_stst,    -- verfied with Rick
     DATE_FORMAT(stst.studystat_endt,'%Y%m%d')         AS statusEndDt_stst,      -- seems to be system generated end date for the row and is 
     DATE_FORMAT(stst.studystat_validt,'%Y%m%d')       AS statusValidUntilDt_stst,   -- will be blank if isCurrentStat=1; 
@@ -193,8 +197,8 @@ SELECT
     RTRIM(SUBSTRING(stst.STUDYSTAT_NOTE,1,2000))      AS statusNote_stst,       -- to support weekly status reporting add 9/11/2020
     
   /** STUDY SITE DATA -- This is added via a link after NationalSampleSize is entered for the STUDY --related to both SITE and STUDYSTATUS table **/
-    CAST(TRIM(stsi.studysite_lsamplesize) AS unsigned)AS sampleSizeLocal_stsi,     -- this IS the local sample size by site/organization, add TRIM for trailing space found 1/20/2021 on PK4920 (study NRG-CC007CD)
-    CAST(stsi.studysite_enrcount AS unsigned)         AS enrolledCount_stsi,        -- is this in the UI?  How to check this?
+    CAST(TRIM(stsi.studysite_lsamplesize) AS unsigned)     AS sampleSizeLocal_stsi,     -- this IS the local sample size by site/organization, ADD TRIM for trailing space found 1/20/2021 on PK4920 (study NRG-CC007CD) 
+    CAST(stsi.studysite_enrcount AS unsigned)        AS enrolledCount_stsi,        -- is this in the UI?  How to check this?
     
   /** STUDY TEAM **/
     sttmRegCoor.usr_Lastname                          AS regCoordPrimLast_sttm_lu,   -- study team   
@@ -263,13 +267,13 @@ LEFT JOIN er_studyID stidTotTar       ON st.PK_STUDY = stidTotTar.FK_STUDY AND s
 LEFT JOIN er_studyID stidAddInf       ON st.PK_STUDY = stidAddInf.FK_STUDY AND stidAddInf.fk_codelst_idType = 8295
 LEFT JOIN er_studyID stidIrbNum       ON st.PK_STUDY = stidIrbNum.FK_STUDY AND stidIrbNum.fk_codelst_idType = 8258
 LEFT JOIN er_studyID stidIrbOth       ON st.PK_STUDY = stidIrbOth.FK_STUDY AND stidIrbOth.fk_codelst_idType = 8259
-LEFT JOIN ref_clinical_working_group    rcwg  ON stidClWrkG.studyid_id = rcwg.VALUE-- add reference table clinical working group name
+LEFT JOIN ref_clinical_working_group    rcwg  ON stidClWrkG.studyid_id = rcwg.VALUE -- add reference table clinical working group name
 ;
 /**********************************************************************************************************************************/
- 
+
 /* BEGIN POPULATE TABLE  */
 TRUNCATE TABLE dm_study;
-INSERT INTO dm_study
+INSERT INTO dm_study 
 SELECT * FROM temp_DM_Study
 ;
   
@@ -277,6 +281,6 @@ SELECT * FROM temp_DM_Study
 DROP TABLE temp_diseaseNames;
 DROP TABLE temp_assocStudy;
 DROP TABLE temp_DM_Study;
-/**********************************************************************************************************************************/
 
-END;
+END
+/**********************************************************************************************************************************/
