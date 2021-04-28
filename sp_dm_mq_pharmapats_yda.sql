@@ -139,7 +139,9 @@ CREATE TEMPORARY TABLE tmqD
   ;  
 /**********************************************************************************************************************************/
 
-/** Place yesterday into history TABLE **/
+/** Place yesterday into history TABLE.
+    Note; in case of errors in automation, when MANUALLY executing the next 2 lines may need 
+    to be commented out in order to avoid placing duplicate information into history table. **/
 INSERT INTO dm_PharmaPats_H
 SELECT * from dm_PharmaPats_YDA;
 
