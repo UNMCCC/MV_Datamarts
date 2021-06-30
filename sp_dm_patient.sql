@@ -9,7 +9,7 @@ BEGIN
    **  Aliases:    p = person, pp = patprot, pid = patperID,  pss  = patstudystat,
    **              s = site,   st = study,   stid = studyid,   stst = studystat, sttm = studyteam, stsi = studysites,
    **
-   **  Last update date: 2020-08-31
+   **  Last update date: 6/30/2021 add address1 and address2 to support project to possibly match with NMTR
    *******************************************************************************************************************************/
 
 /** TEMPORARY TABLE CREATED TO CONCATENATE MULTIPLE RACE DESCRIPTIONS **/
@@ -222,7 +222,9 @@ SELECT
 
   /** PAT_PerID -- patient-level disease site only **/
     refDisease.description                              AS diseaseType_pid_lu,
-    CURRENT_TIMESTAMP()                                 AS xDMrunDt
+    CURRENT_TIMESTAMP()                                 AS xDMrunDt,
+    RTRIM(SUBSTRING(p.PERSON_ADDRESS1, 1, 100))         AS patAddress1_p, -- 6/30/2021 add to support project to possibly match with NMTR
+    RTRIM(SUBSTRING(p.PERSON_ADDRESS2, 1, 100))         AS patAddress2_p -- 6/30/2021 add to support project to possibly match with NMTR
  
 /**********************************************************************************************************************************/ 
 FROM temp_PatProt pp
@@ -281,4 +283,3 @@ DROP TABLE temp_PatProt;
 DROP TABLE temp_dm_patient;
  
 END;
-
