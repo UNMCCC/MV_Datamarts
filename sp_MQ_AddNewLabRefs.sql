@@ -17,7 +17,7 @@ BEGIN
   --  Project:      Velos Calendars
   --  Author:       Rick Compton
   --  Created:      February 2021
-  --  Modified:                    
+  --  Modified:     Rick Compton 9/9/2022
   --  Formerly:     
 \*********************************************************************************************************************************************/
 
@@ -35,7 +35,8 @@ SELECT DISTINCT
   'Auto'  AS comments,
   CURRENT_TIMESTAMP() AS createDtTm,
   NULL AS modDtTm
-FROM mq_labs a
+-- FROM mq_labs a
+FROM mq_labs_90days a
 LEFT JOIN ref_labs_cpts b ON a.lab_name = b.labdesc
 WHERE b.map_status IS NULL
 ;
