@@ -1,4 +1,6 @@
 DROP PROCEDURE IF EXISTS sp_MQ_AddNewLabRefs;
+DELIMITER // -- add to support MySQL v8.0
+
 CREATE PROCEDURE `sp_MQ_AddNewLabRefs`()
 BEGIN
 
@@ -48,4 +50,6 @@ SELECT * from tempMissingLabs;
 /** Drop temporary tables created for use in this stored procedure **/
 DROP TABLE tempMissingLabs;
 
-END;
+END//
+-- add to support MySQL v8.0
+DELIMITER;
